@@ -8,6 +8,8 @@ import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import { AppContext } from "../contexts/AppContext";
 import NavigationDrawer from "./NavigationDrawer";
+import { useHistory } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -25,10 +27,15 @@ const useStyles = makeStyles(theme => ({
 export default function Navigation() {
     const classes = useStyles();
     const context = useContext(AppContext);
+    const userContext = useContext(UserContext);
+    const history = useHistory();
+
+    function login() {
+        history.push("/login");
+    }
 
     return (
         <div className={classes.root}>
-            <NavigationDrawer />
             <AppBar position="static">
                 <Toolbar>
                     <IconButton
@@ -43,9 +50,18 @@ export default function Navigation() {
                     <Typography variant="h6" className={classes.title}>
                         Point Of Sale System
                     </Typography>
-                    <Button color="inherit">Login</Button>
+                    {userContext.user ? (
+                        <Button color="inherit" onClick={userContext.logout}>
+                            Logout
+                        </Button>
+                    ) : (
+                        <Button color="inherit" onClick={login}>
+                            Login
+                        </Button>
+                    )}
                 </Toolbar>
             </AppBar>
+            <NavigationDrawer />
         </div>
     );
 }

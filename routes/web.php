@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::view('/{path?}', 'index')
+    ->where('path', '.*')
+    ->name('react');
+
 Route::get('/', 'SiteController@index');
 
 Auth::routes();
