@@ -31,7 +31,7 @@ class CreateUsersTable extends Migration
             $table->timestamps();
         });
 
-        DB::table("provinces")->insert([
+        DB::table("users")->insert([
             [
                 "name" => "Ahmed Khan",
                 "username" => "admin",
