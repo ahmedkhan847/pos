@@ -57,7 +57,7 @@ function OrderItem({
     }
     return (
         <Grid container spacing={1}>
-            <Grid item md={4}>
+            <Grid item md={4} sm={12}>
                 {selectLoading ? (
                     <LinearProgress />
                 ) : (
@@ -82,7 +82,7 @@ function OrderItem({
                 )}
             </Grid>
 
-            <Grid item md={3}>
+            <Grid item md={3} sm={12}>
                 <TextField
                     autoFocus
                     margin="dense"
@@ -96,7 +96,7 @@ function OrderItem({
                     variant="outlined"
                 />
             </Grid>
-            <Grid item md={3}>
+            <Grid item md={3} sm={12}>
                 <TextField
                     autoFocus
                     margin="dense"
@@ -111,7 +111,7 @@ function OrderItem({
                     disabled
                 />
             </Grid>
-            <Grid item md={2}>
+            <Grid item md={2} sm={12}>
                 <IconButton onClick={addItem} color="secondary">
                     <AddIcon />
                 </IconButton>
