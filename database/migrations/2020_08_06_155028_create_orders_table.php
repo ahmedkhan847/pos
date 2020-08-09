@@ -19,6 +19,7 @@ class CreateOrdersTable extends Migration
             $table->integer("quantity");
             $table->integer("total_amount");
             $table->bigInteger("user_id");
+            $table->enum("status", ["pending", "completed"]);
             $table->timestamps();
         });
     }
