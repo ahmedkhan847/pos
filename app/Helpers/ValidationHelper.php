@@ -24,7 +24,10 @@ class ValidationHelper
         $rules = [
             "create-user" => [
                 'name' => 'required|string|max:255',
-
+                'username' => 'required|string|unique:users|min:5|max:150',
+                'password' => 'required|string|min:6|max:20',
+                'company_name' => 'string|min:6|max:20',
+                'user_type' => 'required|string'
             ],
             "login-user" => [
                 'username' => 'required|string|min:5|max:150',

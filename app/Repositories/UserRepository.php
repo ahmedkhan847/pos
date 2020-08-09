@@ -45,12 +45,9 @@ class UserRepository
     {
         DB::beginTransaction();
         $token = Str::random(32);
-        $data = [
-            'name' => $request->name,
-            'username' => $request->username,
-            'password' => Hash::make($request->password),
-            'api_token' => $token
-        ];
+        $data = $request->all();
+        $data['password'] = Hash::make($request->password);
+        $data['api_token'] = $token;
         if ($request->hasfile("avatar")) {
             $path = $request->file('avatar')->store('avatars', "public");
             $data["avatar"] = "storage/" . $path;

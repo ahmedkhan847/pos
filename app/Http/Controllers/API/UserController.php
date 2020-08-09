@@ -24,6 +24,16 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        return ResponseHelper::prepareResult($this->userRepository->find($request->all()), [], "User created successfully");
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function loggedInUser(Request $request)
+    {
         return ResponseHelper::prepareResult(["user" => $request->user()], [], "User created successfully");
     }
 

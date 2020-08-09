@@ -31,7 +31,7 @@ function Edit({ menu, reload }) {
             <MenuDialog
                 open={open}
                 handleClose={handleClose}
-                title="Add"
+                title="Edit"
                 handleClick={handleClick}
                 loading={loading}
                 menu={menu}

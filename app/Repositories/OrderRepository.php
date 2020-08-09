@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Order;
 use App\OrderItems;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class OrderRepository
@@ -11,7 +12,7 @@ class OrderRepository
     public function findById($id)
     {
         try {
-            $user = Order::findOrFail($id);
+            $user = Order::with(["items.menu:id,name"])->findOrFail($id);
             return $user;
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             return false;
@@ -20,6 +21,7 @@ class OrderRepository
 
     public function find($where = [])
     {
+        $where["user_id"] = Auth::user()->id;
         $users = Order::with(["items.menu:id,name"])->where($where)->orderBy("id", "ASC")->get();
         return $users;
     }
@@ -44,6 +46,8 @@ class OrderRepository
     {
         DB::beginTransaction();
         $data = $request->all();
+        $user = Auth::user()->id;
+        $data["user_id"] = $user;
         $order =  Order::create($data);
 
         foreach ($request->items as $items) {
@@ -62,8 +66,15 @@ class OrderRepository
             DB::beginTransaction();
             $data = $request->all();
             $order->update($data);
-            foreach ($request->items as $items) {
-                $order->items()->create($items);
+            if ($request->has("items")) {
+
+                foreach ($request->items as $items) {
+                    if (isset($items["id"])) {
+                        $this->updateItem($items["id"], $items);
+                    } else {
+                        $order->items()->create($items);
+                    }
+                }
             }
             DB::commit();
             return true;
@@ -77,7 +88,7 @@ class OrderRepository
         try {
             $order = OrderItems::findOrFail($id);
             DB::beginTransaction();
-            $data = $request->all();
+            $data = gettype($request) === "array" ? $request : $request->all();
             $order->update($data);
             DB::commit();
             return true;

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Menu;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MenuRepository
@@ -19,6 +20,7 @@ class MenuRepository
 
     public function find($where)
     {
+        $where["user_id"] = Auth::user()->id;
         $users = Menu::with(["category"])->where($where)->orderBy("id", "DESC")->get();
         return $users;
     }
@@ -43,7 +45,9 @@ class MenuRepository
     {
         DB::beginTransaction();
         $data = $request->all();
-        $user =  Menu::create($data);
+        $user = Auth::user()->id;
+        $data["user_id"] = $user;
+        Menu::create($data);
         DB::commit();
         return true;
     }

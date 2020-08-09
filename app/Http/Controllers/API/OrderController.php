@@ -67,7 +67,7 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return ResponseHelper::prepareResult([], $validator->errors(), "Unable to update order");
         }
-        $order = $this->orderRepository->update($id, $request->all());
+        $order = $this->orderRepository->update($id, $request);
         return ResponseHelper::prepareResult($order, [], "order updated successfully");
     }
 

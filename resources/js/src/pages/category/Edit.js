@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Button } from "@material-ui/core";
+import { IconButton } from "@material-ui/core";
 import { POS } from "../../service/pos";
 import CategoryDialog from "./CategoryDialog";
+import CreateIcon from "@material-ui/icons/Create";
 
 function Edit({ category, reload }) {
     const [open, setOpen] = useState(false);
@@ -29,14 +30,14 @@ function Edit({ category, reload }) {
             <CategoryDialog
                 open={open}
                 handleClose={handleClose}
-                title="Add"
+                title="Edit"
                 handleClick={handleClick}
                 loading={loading}
                 category={category}
             />
-            <Button variant="outlined" color="primary" onClick={handleOpen}>
-                Edit
-            </Button>
+            <IconButton variant="outlined" color="primary" onClick={handleOpen}>
+                <CreateIcon />
+            </IconButton>
         </>
     );
 }

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Category;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CategoryRepository
@@ -19,6 +20,7 @@ class CategoryRepository
 
     public function find($where = [])
     {
+        $where["user_id"] = Auth::user()->id;
         $users = Category::where($where)->orderBy("id", "DESC")->get();
         return $users;
     }
@@ -43,7 +45,9 @@ class CategoryRepository
     {
         DB::beginTransaction();
         $data = $request->all();
-        $user =  Category::create($data);
+        $user = Auth::user()->id;
+        $data["user_id"] = $user;
+        Category::create($data);
         DB::commit();
         return true;
     }

@@ -10,6 +10,7 @@ import {
 import { routes } from "../config/routes";
 import { AppContext } from "../contexts/AppContext";
 import { NavLink as Link } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
 const styles = () => ({
     root: {
@@ -18,12 +19,20 @@ const styles = () => ({
 });
 function NavigationDrawer({ classes }) {
     const context = useContext(AppContext);
-    return (
+    const userContext = useContext(UserContext);
+    console.log(userContext);
+    return userContext.user ? (
         <React.Fragment>
             <Drawer open={context.isDrawerOpen} onClose={context.toggleDrawer}>
                 <List component="nav">
                     {routes
                         .filter(route => route.name)
+                        .filter(route => {
+                            if (!route.user_type) return true;
+                            if (route.user_type === userContext.user.user_type)
+                                return true;
+                            return false;
+                        })
                         .map((route, index) => (
                             <Link to={route.path} key={index}>
                                 <ListItem
@@ -39,6 +48,8 @@ function NavigationDrawer({ classes }) {
                 </List>
             </Drawer>
         </React.Fragment>
+    ) : (
+        <></>
     );
 }
 

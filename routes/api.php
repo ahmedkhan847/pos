@@ -20,7 +20,8 @@ Route::group(['middleware' => ['json.response']], function () {
     Route::post('/login', "API\UserController@login");
 
     Route::group(["middleware" => ["auth:api"]], function () {
-        Route::get('/user', "API\UserController@index");
+        Route::get('/logged-user', "API\UserController@loggedInUser");
+        Route::resource('/user', "API\UserController");
         Route::resource('/category', 'API\CategoryController');
         Route::resource('/menu', 'API\MenuController');
         Route::resource('/order', 'API\OrderController');
