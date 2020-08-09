@@ -18,6 +18,7 @@ class CreateMenusTable extends Migration
             $table->string("name");
             $table->bigInteger("category_id");
             $table->integer("price");
+            $table->bigInteger("user_id");
             $table->timestamps();
         });
     }
