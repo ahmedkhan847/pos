@@ -29,6 +29,11 @@ function NavigationDrawer({ classes }) {
                         .filter(route => route.name)
                         .filter(route => {
                             if (!route.user_type) return true;
+                            if (typeof route.user_type === "object") {
+                                return route.user_type.includes(
+                                    userContext.user.user_type
+                                );
+                            }
                             if (route.user_type === userContext.user.user_type)
                                 return true;
                             return false;

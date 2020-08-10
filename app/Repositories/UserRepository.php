@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -48,6 +49,11 @@ class UserRepository
         $data = $request->all();
         $data['password'] = Hash::make($request->password);
         $data['api_token'] = $token;
+
+        if ($request->user_type === "vendor_child") {
+            $data["parent_id"] = Auth::user()->id;
+        }
+
         if ($request->hasfile("avatar")) {
             $path = $request->file('avatar')->store('avatars', "public");
             $data["avatar"] = "storage/" . $path;

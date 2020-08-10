@@ -25,6 +25,7 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::resource('/category', 'API\CategoryController');
         Route::resource('/menu', 'API\MenuController');
         Route::resource('/order', 'API\OrderController');
+        Route::get('/order-counts', 'API\OrderController@dashboard');
         Route::get('/order/complete/{id}', "API\OrderController@complete");
     });
 });

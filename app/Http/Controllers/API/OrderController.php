@@ -21,9 +21,9 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return ResponseHelper::prepareResult($this->orderRepository->find([]), [], "Categories");
+        return ResponseHelper::prepareResult($this->orderRepository->find($request), [], "Categories");
     }
 
     /**
@@ -38,8 +38,8 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return ResponseHelper::prepareResult([], $validator->errors(), "Unable to create order");
         }
-        $order = $this->orderRepository->create($request);
-        return ResponseHelper::prepareResult($order, [], "order created successfully");
+        $this->orderRepository->create($request);
+        return ResponseHelper::prepareResult([], [], "order created successfully");
     }
 
     /**
@@ -67,8 +67,8 @@ class OrderController extends Controller
         if ($validator->fails()) {
             return ResponseHelper::prepareResult([], $validator->errors(), "Unable to update order");
         }
-        $order = $this->orderRepository->update($id, $request);
-        return ResponseHelper::prepareResult($order, [], "order updated successfully");
+        $this->orderRepository->update($id, $request);
+        return ResponseHelper::prepareResult([], [], "order updated successfully");
     }
 
     /**
@@ -81,5 +81,11 @@ class OrderController extends Controller
     {
         $this->orderRepository->update($id, ["status" => "completed"]);
         return ResponseHelper::prepareResult([], [], "order created successfully");
+    }
+
+    public function dashboard()
+    {
+        $data = $this->orderRepository->dashboardCount();
+        return ResponseHelper::prepareResult($data, [], "order created successfully");
     }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
     withStyles,
     Dialog,
@@ -10,6 +10,7 @@ import {
     Grid,
     LinearProgress
 } from "@material-ui/core";
+import { UserContext } from "../../contexts/UserContext";
 
 const styles = () => ({});
 
@@ -22,10 +23,17 @@ function CategoryDialog({
     loading,
     errors
 }) {
+    const userContext = useContext(UserContext);
+    const defaultUserType =
+        userContext.user && userContext.user.user_type === "vendor"
+            ? "vendor_child"
+            : "admin";
     const [name, setName] = useState(user ? user.name : "");
     const [username, setUserName] = useState(user ? user.username : "");
     const [password, setPassword] = useState(user ? user.password : "");
-    const [userType, setUserType] = useState(user ? user.user_type : "admin");
+    const [userType, setUserType] = useState(
+        user ? user.user_type : defaultUserType
+    );
 
     const [companyName, setCompanyName] = useState(
         user ? user.company_name : ""
@@ -116,37 +124,46 @@ function CategoryDialog({
                             />
                         </Grid>
 
-                        <Grid item md={12}>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="userType"
-                                name="userType"
-                                label="User Type"
-                                fullWidth
-                                select
-                                onChange={onChange}
-                                value={userType}
-                                variant="outlined"
-                                error={
-                                    errors && errors.user_type ? true : false
-                                }
-                                helperText={
-                                    errors && errors.user_type
-                                        ? errors.user_type[0]
-                                        : ""
-                                }
-                            >
-                                {userTypes.map(option => (
-                                    <option
-                                        key={option.value}
-                                        value={option.value}
-                                    >
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </TextField>
-                        </Grid>
+                        {userContext.user &&
+                        !["vendor", "vendor_child"].includes(
+                            userContext.user.user_type
+                        ) ? (
+                            <Grid item md={12}>
+                                <TextField
+                                    autoFocus
+                                    margin="dense"
+                                    id="userType"
+                                    name="userType"
+                                    label="User Type"
+                                    fullWidth
+                                    select
+                                    onChange={onChange}
+                                    value={userType}
+                                    variant="outlined"
+                                    error={
+                                        errors && errors.user_type
+                                            ? true
+                                            : false
+                                    }
+                                    helperText={
+                                        errors && errors.user_type
+                                            ? errors.user_type[0]
+                                            : ""
+                                    }
+                                >
+                                    {userTypes.map(option => (
+                                        <option
+                                            key={option.value}
+                                            value={option.value}
+                                        >
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </TextField>
+                            </Grid>
+                        ) : (
+                            <></>
+                        )}
                         {userType === "vendor" ? (
                             <Grid item md={12}>
                                 <TextField

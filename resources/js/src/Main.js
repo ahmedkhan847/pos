@@ -14,16 +14,14 @@ const styles = theme => ({
 function Main({ classes }) {
     return (
         <AppContainer>
-            <UserContainer>
-                <Grid container direction="row">
-                    <Grid item md={12}>
-                        <Navigation />
-                    </Grid>
-                    <Grid className={classes.root} item lg={12}>
-                        <Routes />
-                    </Grid>
+            <Grid container direction="row">
+                <Grid item md={12}>
+                    <Navigation />
                 </Grid>
-            </UserContainer>
+                <Grid className={classes.root} item lg={12}>
+                    <Routes />
+                </Grid>
+            </Grid>
         </AppContainer>
     );
 }

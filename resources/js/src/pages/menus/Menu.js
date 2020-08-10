@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Grid } from "@material-ui/core";
 import MaterialTable from "material-table";
 import { POS } from "../../service/pos";
 import Add from "./Add";
 import Edit from "./Edit";
+import { UserContext } from "../../contexts/UserContext";
 
 function Menu() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const userContext = useContext(UserContext);
     useEffect(() => {
-        if (loading) getData();
-    });
+        if (userContext.user && loading) getData();
+    }, [userContext.user]);
 
     async function getData() {
         setLoading(true);

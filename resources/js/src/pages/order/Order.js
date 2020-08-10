@@ -1,9 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
     Grid,
     FormHelperText,
     IconButton,
-    withStyles
+    withStyles,
+    Card,
+    CardContent,
+    CardActions,
+    Button,
+    CardHeader,
+    Typography,
+    TextField
 } from "@material-ui/core";
 import MaterialTable from "material-table";
 import { POS } from "../../service/pos";
@@ -12,6 +19,7 @@ import Edit from "./Edit";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import { useHistory } from "react-router-dom";
+import { UserContext } from "../../contexts/UserContext";
 
 const styles = () => ({
     padding: {
@@ -21,15 +29,35 @@ const styles = () => ({
 function Order({ classes }) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [toDate, setToDate] = useState(null);
+    const [fromDate, setFromDate] = useState(null);
+    const [name, setName] = useState("");
+
     const history = useHistory();
+    const userContext = useContext(UserContext);
+
     useEffect(() => {
-        if (loading) getData();
-    });
+        if (userContext.user && loading) getData();
+    }, [userContext.user]);
 
     async function getData() {
         setLoading(true);
         try {
-            const res = await POS.get("/api/order");
+            const res = await POS.get("/api/order", {
+                params: {
+                    date_from: fromDate,
+                    date_to: toDate,
+                    name
+                }
+            });
+
+            await POS.get("/api/order-counts", {
+                params: {
+                    date_from: fromDate,
+                    date_to: toDate,
+                    name
+                }
+            });
             setData(res.data.data);
             setLoading(false);
         } catch (error) {
@@ -82,8 +110,103 @@ function Order({ classes }) {
                 return <></>;
         }
     }
+
+    function onChange(event) {
+        const target = event.target;
+        if (target.name === "toDate") {
+            setToDate(target.value);
+        } else if (target.name === "fromDate") {
+            setFromDate(target.value);
+        } else if (target.name === "name") {
+            setName(target.value);
+        }
+    }
+
+    function reset() {
+        setName("");
+        setToDate("");
+        setFromDate("");
+        getData();
+    }
     return (
-        <Grid container>
+        <Grid container spacing={2}>
+            <Grid item md={12}>
+                <Card>
+                    <CardHeader
+                        title={<Typography variant="h5">Search</Typography>}
+                    />
+                    <CardContent>
+                        <Grid container spacing={2}>
+                            <Grid item md={4} sm={12}>
+                                <TextField
+                                    id="name"
+                                    name="name"
+                                    label="Name"
+                                    value={name}
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={onChange}
+                                    required
+                                />
+                            </Grid>
+                            <Grid item md={4} sm={12}>
+                                <TextField
+                                    id="to"
+                                    name="toDate"
+                                    label="To"
+                                    type="date"
+                                    InputLabelProps={{
+                                        shrink: true
+                                    }}
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={onChange}
+                                    required
+                                />
+                            </Grid>
+                            <Grid item md={4} sm={12}>
+                                <TextField
+                                    id="from"
+                                    name="fromDate"
+                                    label="From"
+                                    type="date"
+                                    InputLabelProps={{
+                                        shrink: true
+                                    }}
+                                    fullWidth
+                                    variant="outlined"
+                                    onChange={onChange}
+                                    required
+                                />
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                    <CardActions>
+                        <Grid container justify="flex-end" spacing={1}>
+                            <Grid item>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={getData}
+                                    disabled={loading}
+                                >
+                                    Search
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    onClick={reset}
+                                    disabled={loading}
+                                >
+                                    Reset
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </CardActions>
+                </Card>
+            </Grid>
             <Grid item md={12}>
                 <MaterialTable
                     title="Orders"
@@ -134,7 +257,10 @@ function Order({ classes }) {
                         Action
                     }}
                     options={{
-                        actionsColumnIndex: -1
+                        actionsColumnIndex: -1,
+                        exportButton: true,
+                        exportCsv: true,
+                        exportAllData: true
                     }}
                 />
             </Grid>

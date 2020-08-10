@@ -19,11 +19,22 @@ class OrderRepository
         }
     }
 
-    public function find($where = [])
+    public function find($request)
     {
-        $where["user_id"] = Auth::user()->id;
-        $users = Order::with(["items.menu:id,name"])->where($where)->orderBy("id", "ASC")->get();
-        return $users;
+        $where = [];
+        $user = Auth::user();
+        $user_id = $user->parent_id === 0 ? $user->id : $user->parent_id;
+        $where["user_id"] = $user_id;
+        $users = Order::with(["items.menu:id,name"])->where($where);
+
+        $users->when($request->name, function ($query, $name) {
+            return $query->where("name", "like", "%$name%");
+        });
+        if (isset($request->date_from) && isset($request->date_to)) {
+            $users->whereBetween("created_at", [$request->date_from . " 00:00:00", $request->date_to . " 23:59:59"]);
+        }
+
+        return $users->orderBy("id", "ASC")->get();
     }
 
     public function findOne($where)
@@ -46,8 +57,9 @@ class OrderRepository
     {
         DB::beginTransaction();
         $data = $request->all();
-        $user = Auth::user()->id;
-        $data["user_id"] = $user;
+        $user = Auth::user();
+        $user_id = $user->parent_id === 0 ? $user->id : $user->parent_id;
+        $data["user_id"] = $user_id;
         $order =  Order::create($data);
 
         foreach ($request->items as $items) {
@@ -95,5 +107,27 @@ class OrderRepository
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             return false;
         }
+    }
+
+    function dashboardCount()
+    {
+        $user = Auth::user();
+        $user_id = $user->parent_id === 0 ? $user->id : $user->parent_id;
+
+        $todayOrders = Order::selectRaw("count(id) as today")
+            ->whereRaw("date(created_at) = date(NOW())")
+            ->where("user_id", $user_id)
+            ->first();
+
+        $last15Days = Order::selectRaw("count(id) as fiftenDays")
+            ->whereRaw("created_at BETWEEN NOW() - INTERVAL 15 DAY AND NOW()")
+            ->where("user_id", $user_id)
+            ->first();
+        $last30Days = Order::selectRaw("count(id) as thirtyDays")
+            ->whereRaw("created_at BETWEEN NOW() - INTERVAL 30 DAY AND NOW()")
+            ->where("user_id", $user_id)
+            ->first();
+
+        return ["today" => $todayOrders["today"], "lastFifteen" => $last15Days["fiftenDays"], "lastThirty" => $last30Days["thirtyDays"]];
     }
 }

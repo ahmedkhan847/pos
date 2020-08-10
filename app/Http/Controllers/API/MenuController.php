@@ -38,8 +38,8 @@ class MenuController extends Controller
         if ($validator->fails()) {
             return ResponseHelper::prepareResult([], $validator->errors(), "Unable to create menu");
         }
-        $menu = $this->menuRepository->create($request);
-        return ResponseHelper::prepareResult($menu, [], "menu created successfully");
+        $this->menuRepository->create($request);
+        return ResponseHelper::prepareResult([], [], "menu created successfully");
     }
 
     /**

@@ -26,7 +26,7 @@ export const routes = [
         component: User,
         icon: <PersonAddIcon />,
         isPrivate: true,
-        user_type: "admin"
+        user_type: ["admin", "vendor"]
     },
     {
         path: "/menu",

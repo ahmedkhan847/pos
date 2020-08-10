@@ -20,7 +20,9 @@ class MenuRepository
 
     public function find($where)
     {
-        $where["user_id"] = Auth::user()->id;
+        $user = Auth::user();
+        $user_id = $user->parent_id === 0 ? $user->id : $user->parent_id;
+        $where["user_id"] = $user_id;
         $users = Menu::with(["category"])->where($where)->orderBy("id", "DESC")->get();
         return $users;
     }
@@ -45,8 +47,9 @@ class MenuRepository
     {
         DB::beginTransaction();
         $data = $request->all();
-        $user = Auth::user()->id;
-        $data["user_id"] = $user;
+        $user = Auth::user();
+        $user_id = $user->parent_id === 0 ? $user->id : $user->parent_id;
+        $data["user_id"] = $user_id;
         Menu::create($data);
         DB::commit();
         return true;

@@ -1,13 +1,21 @@
-import React from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import { Grid } from "@material-ui/core";
+import {
+    Grid,
+    CardHeader,
+    withStyles,
+    Divider,
+    Paper
+} from "@material-ui/core";
+import { UserContext } from "../../contexts/UserContext";
+import { POS } from "../../service/pos";
 
-const useStyles = makeStyles({
+const styles = () => ({
     root: {
         minWidth: 275
     },
@@ -17,49 +25,99 @@ const useStyles = makeStyles({
         transform: "scale(0.8)"
     },
     title: {
-        fontSize: 14
+        fontSize: 20,
+        backgroundColor: "#1976d2",
+        color: "#FFFF"
     },
     pos: {
         marginBottom: 12
+    },
+    number: {
+        textAlign: "center",
+        fontSize: 80,
+        color: "#c51162"
+    },
+    numberFifteen: {
+        textAlign: "center",
+        fontSize: 80,
+        color: "#aa00ff"
+    },
+    numberThirty: {
+        textAlign: "center",
+        fontSize: 80,
+        color: "#00bcd4"
     }
 });
 
-export default function Home() {
-    const classes = useStyles();
-    const bull = <span className={classes.bullet}>•</span>;
+function Widget({ classes, name, number }) {
+    return (
+        <Paper elevation={2}>
+            <Typography
+                variant="subtitle1"
+                className={classes.title}
+                align="center"
+            >
+                {name}
+            </Typography>
+            <Divider variant="fullWidth" />
+            <Typography className={classes.count}>{number}</Typography>
+        </Paper>
+    );
+}
+function Home({ classes }) {
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const userContext = useContext(UserContext);
+
+    useEffect(() => {
+        console.log("here");
+        if (userContext.user && loading) getData();
+    }, [userContext.user]);
+
+    async function getData() {
+        setLoading(true);
+        try {
+            const res = await POS.get("/api/order-counts");
+            console.log("getData", res);
+            setData(res.data.data);
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+        }
+    }
 
     return (
-        <Grid container>
-            <Grid item md={6}>
-                <Card className={classes.root}>
-                    <CardContent>
-                        <Typography
-                            className={classes.title}
-                            color="textSecondary"
-                            gutterBottom
-                        >
-                            Word of the Day
-                        </Typography>
-                        <Typography variant="h5" component="h2">
-                            be{bull}nev{bull}o{bull}lent
-                        </Typography>
-                        <Typography
-                            className={classes.pos}
-                            color="textSecondary"
-                        >
-                            adjective
-                        </Typography>
-                        <Typography variant="body2" component="p">
-                            well meaning and kindly.
-                            <br />
-                            {'"a benevolent smile"'}
-                        </Typography>
-                    </CardContent>
-                    <CardActions>
-                        <Button size="small">Learn More</Button>
-                    </CardActions>
-                </Card>
+        <Grid container spacing={2}>
+            <Grid item md={2}>
+                <Widget
+                    name="Today's Orders"
+                    number={data.today}
+                    classes={{ count: classes.number, title: classes.title }}
+                />
+            </Grid>
+            <Grid item md={3}>
+                <Widget
+                    name="Last 15 Days Orders"
+                    number={data.lastFifteen}
+                    classes={{
+                        count: classes.numberFifteen,
+                        title: classes.title
+                    }}
+                />
+            </Grid>
+            <Grid item md={3}>
+                <Widget
+                    name="Last 30 Days Orders"
+                    number={data.lastThirty}
+                    classes={{
+                        count: classes.numberThirty,
+                        title: classes.title
+                    }}
+                />
             </Grid>
         </Grid>
     );
 }
+
+export default withStyles(styles)(Home);
