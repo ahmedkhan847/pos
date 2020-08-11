@@ -34,7 +34,7 @@ class UserController extends Controller
      */
     public function loggedInUser(Request $request)
     {
-        return ResponseHelper::prepareResult(["user" => $request->user()], [], "User created successfully");
+        return ResponseHelper::prepareResult(["user" => $this->userRepository->findById($request->user()->id)], [], "User created successfully");
     }
 
     /**

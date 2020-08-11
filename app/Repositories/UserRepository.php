@@ -13,7 +13,7 @@ class UserRepository
     public function findById($id)
     {
         try {
-            $user = User::findOrFail($id);
+            $user = User::with(["parent"])->findOrFail($id);
             return $user;
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $ex) {
             return false;

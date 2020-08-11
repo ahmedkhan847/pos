@@ -1,43 +1,40 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import PrintIcon from "@material-ui/icons/Print";
 import {
     Grid,
-    FormHelperText,
     IconButton,
     withStyles,
-    Table,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    TableContainer,
     Divider,
-    Box,
     LinearProgress,
-    Paper,
     Typography,
     Card,
     CardContent,
     CardActions
 } from "@material-ui/core";
-
-import print from "print-js";
 import { useParams } from "react-router-dom";
 import { POS } from "../../service/pos";
+import { UserContext } from "../../contexts/UserContext";
 
 const styles = () => ({
     item: {
         marginTop: 8
     }
 });
-function Order({ order, classes }) {
+function Order({ order, classes, print, userContext }) {
+    function getUser() {
+        if (!userContext.user) return "";
+        if (userContext.user.user_type === "admin") return "";
+        if (userContext.user.parent_id === 0)
+            return userContext.user.company_name;
+        else return userContext.user.parent.company_name;
+    }
     return (
         <Card>
             <CardContent>
                 <Grid id="order-item" container spacing={2}>
                     <Grid item md={12}>
                         <Grid container item justify="center">
-                            <Typography variant="h3">La More</Typography>
+                            <Typography variant="h3">{getUser()}</Typography>
                             <Divider />
                         </Grid>
                     </Grid>
@@ -86,7 +83,7 @@ function Order({ order, classes }) {
                                     {row.menu.name}
                                 </Grid>
                                 <Grid item md={4}>
-                                    {row.price}
+                                    Rs. {row.price}
                                 </Grid>
                             </Grid>
                         ))}
@@ -100,14 +97,14 @@ function Order({ order, classes }) {
                                 Total
                             </Grid>
                             <Grid item md={6}>
-                                {order.total_amount}
+                                Rs. {order.total_amount}
                             </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
             </CardContent>
             <CardActions>
-                <IconButton variant="outlined" onClick={() => window.print()}>
+                <IconButton variant="outlined" onClick={print}>
                     <PrintIcon />
                 </IconButton>
             </CardActions>
@@ -118,10 +115,10 @@ function View({ classes }) {
     const { bvid } = useParams();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
-
+    const userContext = useContext(UserContext);
     useEffect(() => {
-        if (loading) getData();
-    }, [bvid]);
+        if (loading && userContext.user) getData();
+    }, [bvid, userContext.user]);
 
     async function getData() {
         setLoading(true);
@@ -133,13 +130,33 @@ function View({ classes }) {
             setLoading(false);
         }
     }
+
+    async function print() {
+        setLoading(true);
+        try {
+            const res = await POS.get(`/api/print`, {
+                params: {
+                    order_id: bvid
+                }
+            });
+            setLoading(false);
+        } catch (error) {
+            setLoading(false);
+        }
+    }
+
     return (
         <Grid container>
             <Grid item md={12}>
                 {loading ? (
                     <LinearProgress />
                 ) : (
-                    <Order order={order} classes={classes} />
+                    <Order
+                        order={order}
+                        classes={classes}
+                        print={print}
+                        userContext={userContext}
+                    />
                 )}
             </Grid>
         </Grid>
