@@ -127,7 +127,14 @@ class OrderRepository
             ->whereRaw("created_at BETWEEN NOW() - INTERVAL 30 DAY AND NOW()")
             ->where("user_id", $user_id)
             ->first();
-
-        return ["today" => $todayOrders["today"], "lastFifteen" => $last15Days["fiftenDays"], "lastThirty" => $last30Days["thirtyDays"]];
+        $pendingOrders = Order::selectRaw("count(id) as today")
+            ->where(["user_id" => $user_id, "status" => "pending"])
+            ->first();
+        return [
+            "pendingOrders" => $pendingOrders["today"],
+            "today" => $todayOrders["today"],
+            "lastFifteen" => $last15Days["fiftenDays"],
+            "lastThirty" => $last30Days["thirtyDays"]
+        ];
     }
 }

@@ -20,7 +20,7 @@ const styles = () => ({
 function NavigationDrawer({ classes }) {
     const context = useContext(AppContext);
     const userContext = useContext(UserContext);
-    console.log(userContext);
+
     return userContext.user ? (
         <React.Fragment>
             <Drawer open={context.isDrawerOpen} onClose={context.toggleDrawer}>

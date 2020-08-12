@@ -12,7 +12,7 @@ import {
     LinearProgress,
     FormHelperText
 } from "@material-ui/core";
-import { POS } from "../../service/pos";
+import POS from "../../service/pos";
 import { UserContext } from "../../contexts/UserContext";
 import { useHistory } from "react-router-dom";
 
@@ -32,7 +32,7 @@ function Login({ classes }) {
         setLoading(true);
         setError(null);
         try {
-            const res = await POS.post("/api/login", {
+            const res = await POS.getAxios().post("/api/login", {
                 username,
                 password
             });

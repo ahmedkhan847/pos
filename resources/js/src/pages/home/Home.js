@@ -1,9 +1,4 @@
 import React, { useState, useContext, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Card from "@material-ui/core/Card";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
-import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import {
     Grid,
@@ -13,7 +8,7 @@ import {
     Paper
 } from "@material-ui/core";
 import { UserContext } from "../../contexts/UserContext";
-import { POS } from "../../service/pos";
+import POS from "../../service/pos";
 
 const styles = () => ({
     root: {
@@ -35,7 +30,7 @@ const styles = () => ({
     number: {
         textAlign: "center",
         fontSize: 80,
-        color: "#c51162"
+        color: "#00701a"
     },
     numberFifteen: {
         textAlign: "center",
@@ -46,6 +41,11 @@ const styles = () => ({
         textAlign: "center",
         fontSize: 80,
         color: "#00bcd4"
+    },
+    numberPending: {
+        color: "#ba000d",
+        textAlign: "center",
+        fontSize: 80
     }
 });
 
@@ -71,15 +71,14 @@ function Home({ classes }) {
     const userContext = useContext(UserContext);
 
     useEffect(() => {
-        console.log("here");
+        console.log(userContext.user);
         if (userContext.user && loading) getData();
     }, [userContext.user]);
 
     async function getData() {
         setLoading(true);
         try {
-            const res = await POS.get("/api/order-counts");
-            console.log("getData", res);
+            const res = await POS.getAxios().get("/api/order-counts");
             setData(res.data.data);
             setLoading(false);
         } catch (error) {
@@ -89,6 +88,16 @@ function Home({ classes }) {
 
     return (
         <Grid container spacing={2}>
+            <Grid item md={2}>
+                <Widget
+                    name="Pending Orders"
+                    number={data.pendingOrders}
+                    classes={{
+                        count: classes.numberPending,
+                        title: classes.title
+                    }}
+                />
+            </Grid>
             <Grid item md={2}>
                 <Widget
                     name="Today's Orders"

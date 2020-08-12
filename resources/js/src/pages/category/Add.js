@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Grid, withStyles } from "@material-ui/core";
-import { POS } from "../../service/pos";
+import POS from "../../service/pos";
 import CategoryDialog from "./CategoryDialog";
 const styles = () => ({
     button: {
@@ -20,7 +20,7 @@ function Add({ classes, reload }) {
     async function handleClick(name) {
         setLoading(true);
         try {
-            await POS.post("/api/category", {
+            await POS.getAxios().post("/api/category", {
                 name
             });
             setOpen(false);

@@ -13,13 +13,13 @@ import {
     TextField
 } from "@material-ui/core";
 import MaterialTable from "material-table";
-import { POS } from "../../service/pos";
 import Add from "./Add";
 import Edit from "./Edit";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import { useHistory } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
+import POS from "../../service/pos";
 
 const styles = () => ({
     padding: {
@@ -43,7 +43,7 @@ function Order({ classes }) {
     async function getData() {
         setLoading(true);
         try {
-            const res = await POS.get("/api/order", {
+            const res = await POS.getAxios().get("/api/order", {
                 params: {
                     date_from: fromDate,
                     date_to: toDate,
@@ -51,7 +51,7 @@ function Order({ classes }) {
                 }
             });
 
-            await POS.get("/api/order-counts", {
+            await POS.getAxios().get("/api/order-counts", {
                 params: {
                     date_from: fromDate,
                     date_to: toDate,
@@ -68,7 +68,12 @@ function Order({ classes }) {
     async function complete(order) {
         setLoading(true);
         try {
-            await POS.get(`/order/complete/${order.id}`);
+            POS;
+            await POS.getAxios().get(`/api/order/complete/${order.id}`, {
+                params: {
+                    status: "completed"
+                }
+            });
         } catch (error) {}
 
         getData();
@@ -81,9 +86,13 @@ function Order({ classes }) {
             case "edit":
                 return (
                     <Grid container justify="center">
-                        <Grid item md={2} className={classes.padding}>
-                            <Edit reload={getData} order={props.data} />
-                        </Grid>
+                        {props.data.status === "pending" ? (
+                            <Grid item md={2} className={classes.padding}>
+                                <Edit reload={getData} order={props.data} />
+                            </Grid>
+                        ) : (
+                            <></>
+                        )}
                         <Grid item md={2} className={classes.padding}>
                             <IconButton
                                 variant="outlined"

@@ -77,9 +77,9 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function complete($id)
+    public function complete($id, Request $request)
     {
-        $this->orderRepository->update($id, ["status" => "completed"]);
+        $this->orderRepository->update($id, $request);
         return ResponseHelper::prepareResult([], [], "order created successfully");
     }
 

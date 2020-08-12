@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Grid } from "@material-ui/core";
 import MaterialTable from "material-table";
-import { POS } from "../../service/pos";
+import POS from "../../service/pos";
 import Add from "./Add";
 import Edit from "./Edit";
 import { UserContext } from "../../contexts/UserContext";
@@ -17,7 +17,7 @@ function Category() {
     async function getData() {
         setLoading(true);
         try {
-            const res = await POS.get("/api/category");
+            const res = await POS.getAxios().get("/api/category");
             setData(res.data.data);
             setLoading(false);
         } catch (error) {}
