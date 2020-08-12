@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@material-ui/core";
 import MenuDialog from "./MenuDialog";
-import POS from "../../service/pos";
+import { POS } from "../../service/pos";
 
 function Edit({ menu, reload }) {
     const [open, setOpen] = useState(false);
@@ -16,7 +16,7 @@ function Edit({ menu, reload }) {
     async function handleClick(name, category, price) {
         setLoading(true);
         try {
-            await POS.getAxios().put(`/api/menu/${menu.id}`, {
+            await POS.put(`/api/menu/${menu.id}`, {
                 name,
                 price,
                 category_id: category

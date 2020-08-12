@@ -19,7 +19,7 @@ import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import VisibilityIcon from "@material-ui/icons/Visibility";
 import { useHistory } from "react-router-dom";
 import { UserContext } from "../../contexts/UserContext";
-import POS from "../../service/pos";
+import { POS } from "../../service/pos";
 
 const styles = () => ({
     padding: {
@@ -43,7 +43,7 @@ function Order({ classes }) {
     async function getData() {
         setLoading(true);
         try {
-            const res = await POS.getAxios().get("/api/order", {
+            const res = await POS.get("/api/order", {
                 params: {
                     date_from: fromDate,
                     date_to: toDate,
@@ -51,7 +51,7 @@ function Order({ classes }) {
                 }
             });
 
-            await POS.getAxios().get("/api/order-counts", {
+            await POS.get("/api/order-counts", {
                 params: {
                     date_from: fromDate,
                     date_to: toDate,
@@ -69,7 +69,7 @@ function Order({ classes }) {
         setLoading(true);
         try {
             POS;
-            await POS.getAxios().get(`/api/order/complete/${order.id}`, {
+            await POS.get(`/api/order/complete/${order.id}`, {
                 params: {
                     status: "completed"
                 }

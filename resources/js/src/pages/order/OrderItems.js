@@ -45,8 +45,6 @@ function OrderItem({
             const selectedMenu = menus
                 .filter(menuItem => menuItem.value === menu)
                 .pop();
-            console.log(selectedMenu);
-            console.log(target.value);
             setQuantity(target.value);
             item.quantity = target.value;
             item.price = parseInt(target.value) * selectedMenu.price;
@@ -125,10 +123,8 @@ function OrderItems({ selectLoading, menus, orderItems, setFinalItems }) {
     const [time, setTime] = useState(0);
 
     function addItem() {
-        console.log("here");
         const updatedItems = items;
         updatedItems.push(item());
-        console.log(updatedItems);
         setItems(updatedItems);
         setTime(Date.now());
     }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { IconButton } from "@material-ui/core";
-import POS from "../../service/pos";
+import { POS } from "../../service/pos";
 import CategoryDialog from "./CategoryDialog";
 import CreateIcon from "@material-ui/icons/Create";
 
@@ -17,7 +17,7 @@ function Edit({ category, reload }) {
     async function handleClick(name) {
         setLoading(true);
         try {
-            await POS.getAxios().put(`/api/category/${category.id}`, {
+            await POS.put(`/api/category/${category.id}`, {
                 name
             });
             setOpen(false);

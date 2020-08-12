@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Grid, withStyles } from "@material-ui/core";
 import OrderDialog from "./OrderDialog";
-import POS from "../../service/pos";
+import { POS } from "../../service/pos";
 const styles = () => ({
     button: {
         marginLeft: 4
@@ -20,7 +20,7 @@ function Add({ classes, reload }) {
     async function handleClick(name, items) {
         setLoading(true);
         try {
-            await POS.getAxios().post("/api/order", {
+            await POS.post("/api/order", {
                 name,
                 items: items.filter(item => item.quantity > 0)
             });

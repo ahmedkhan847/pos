@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import OrderDialog from "./OrderDialog";
-import POS from "../../service/pos";
+import { POS } from "../../service/pos";
 import { IconButton } from "@material-ui/core";
 import CreateIcon from "@material-ui/icons/Create";
 
@@ -17,7 +17,7 @@ function Edit({ order, reload }) {
     async function handleClick(name, items) {
         setLoading(true);
         try {
-            await POS.getAxios().put(`/api/order/${order.id}`, {
+            await POS.put(`/api/order/${order.id}`, {
                 name,
                 items
             });

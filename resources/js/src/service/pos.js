@@ -1,23 +1,22 @@
 import axios from "axios";
 
-const token = localStorage.getItem("token");
-
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
 axios.defaults.headers.common["Access-Control-Allow-Methods"] =
     "GET,PUT,POST,DELETE,PATCH,OPTIONS";
 
-class POSClass {
-    constructor() {
-        this.addBearer();
+axios.interceptors.request.use(function(config) {
+    const token = localStorage.getItem("token");
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
+
+axios.interceptors.response.use(
+    response => {
+        return response;
+    },
+    err => {
+        throw err;
     }
-    static addBearer() {
-        const token = localStorage.getItem("token");
-        if (token)
-            axios.defaults.headers.common.Authorization = `Bearer ${token}`;
-    }
-    static getAxios() {
-        return axios;
-    }
-}
-const posClass = new POSClass();
-export const POS = posClass.getAxios();
+);
+
+export const POS = axios;

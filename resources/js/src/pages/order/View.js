@@ -12,7 +12,7 @@ import {
     CardActions
 } from "@material-ui/core";
 import { useParams } from "react-router-dom";
-import POS from "../../service/pos";
+import { POS } from "../../service/pos";
 import { UserContext } from "../../contexts/UserContext";
 
 const styles = () => ({
@@ -123,7 +123,7 @@ function View({ classes }) {
     async function getData() {
         setLoading(true);
         try {
-            const res = await POS.getAxios().get(`/api/order/${bvid}`);
+            const res = await POS.get(`/api/order/${bvid}`);
             setOrder(res.data.data);
             setLoading(false);
         } catch (error) {

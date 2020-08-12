@@ -10,7 +10,7 @@ import {
     Grid,
     LinearProgress
 } from "@material-ui/core";
-import POS from "../../service/pos";
+import { POS } from "../../service/pos";
 import OrderItems from "./OrderItems";
 
 const styles = () => ({});
@@ -31,7 +31,7 @@ function OrderDialog({
         if (!open) return;
         const getData = async () => {
             try {
-                const res = await POS.getAxios().get("/api/menu");
+                const res = await POS.get("/api/menu");
                 setMenus(
                     res.data.data.map(menu => ({
                         price: menu.price,

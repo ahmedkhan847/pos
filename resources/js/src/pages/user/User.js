@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Grid } from "@material-ui/core";
 import MaterialTable from "material-table";
-import POS from "../../service/pos";
+import { POS } from "../../service/pos";
 import Add from "./Add";
 import Edit from "./Edit";
 import { UserContext } from "../../contexts/UserContext";
@@ -22,7 +22,7 @@ function User() {
             if (userContext.user.user_type === "vendor") {
                 params.parent_id = userContext.user.id;
             }
-            const res = await POS.getAxios().get("/api/user", { params });
+            const res = await POS.get("/api/user", { params });
             setData(res.data.data);
             setLoading(false);
         } catch (error) {}

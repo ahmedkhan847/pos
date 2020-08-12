@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Grid, withStyles } from "@material-ui/core";
 import MenuDialog from "./MenuDialog";
-import POS from "../../service/pos";
+import { POS } from "../../service/pos";
 const styles = () => ({
     button: {
         marginLeft: 4
@@ -20,7 +20,7 @@ function Add({ classes, reload }) {
     async function handleClick(name, category, price) {
         setLoading(true);
         try {
-            await POS.getAxios().post("/api/menu", {
+            await POS.post("/api/menu", {
                 name,
                 price,
                 category_id: category

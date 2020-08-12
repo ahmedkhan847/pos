@@ -8,7 +8,7 @@ import {
     Paper
 } from "@material-ui/core";
 import { UserContext } from "../../contexts/UserContext";
-import POS from "../../service/pos";
+import { POS } from "../../service/pos";
 
 const styles = () => ({
     root: {
@@ -71,14 +71,13 @@ function Home({ classes }) {
     const userContext = useContext(UserContext);
 
     useEffect(() => {
-        console.log(userContext.user);
         if (userContext.user && loading) getData();
     }, [userContext.user]);
 
     async function getData() {
         setLoading(true);
         try {
-            const res = await POS.getAxios().get("/api/order-counts");
+            const res = await POS.get("/api/order-counts");
             setData(res.data.data);
             setLoading(false);
         } catch (error) {
