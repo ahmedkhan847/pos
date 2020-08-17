@@ -5,10 +5,13 @@ import {
     CardHeader,
     withStyles,
     Divider,
-    Paper
+    Paper,
+    Button
 } from "@material-ui/core";
 import { UserContext } from "../../contexts/UserContext";
 import { POS } from "../../service/pos";
+import Highcharts from "highcharts";
+import HighchartsReact from "highcharts-react-official";
 
 const styles = () => ({
     root: {
@@ -46,6 +49,9 @@ const styles = () => ({
         color: "#ba000d",
         textAlign: "center",
         fontSize: 80
+    },
+    chart: {
+        height: "100%"
     }
 });
 
@@ -66,27 +72,107 @@ function Widget({ classes, name, number }) {
 }
 function Home({ classes }) {
     const [data, setData] = useState([]);
+    const [closeTimig, setCloseTimig] = useState({ is_closed: true });
     const [loading, setLoading] = useState(true);
-
+    const [disable, setDisable] = useState(true);
+    const [chartConfig, setChartConfig] = useState({});
     const userContext = useContext(UserContext);
 
     useEffect(() => {
-        if (userContext.user && loading) getData();
+        if (userContext.user && loading) {
+            getData();
+            getClosing();
+        }
     }, [userContext.user]);
 
     async function getData() {
         setLoading(true);
         try {
             const res = await POS.get("/api/order-counts");
+            // const seriesData = res.data.data["months"];
+            console.log(res.data.data["months"]);
             setData(res.data.data);
+            setChartConfig({
+                chart: {
+                    type: "line"
+                },
+                title: {
+                    text: "This Month Sales"
+                },
+                series: [
+                    {
+                        name: "Orders",
+                        data: res.data.data["months"]
+                    }
+                ],
+                xAxis: {
+                    categories: res.data.data["labels"]
+                },
+                yAxis: {
+                    text: "Orders"
+                }
+            });
             setLoading(false);
         } catch (error) {
             setLoading(false);
         }
     }
 
+    async function getClosing() {
+        setDisable(true);
+        try {
+            const res = await POS.get("/api/close-timing");
+            if (res.data.data) setCloseTimig(res.data.data);
+            setDisable(false);
+        } catch (error) {
+            setDisable(false);
+        }
+    }
+
+    async function openCloseShop() {
+        setDisable(true);
+        try {
+            const res = await POS.get(
+                `/api/close-timing/${closeTimig.is_closed ? "open" : "close"}`
+            );
+            if (res.data.data)
+                setCloseTimig({
+                    is_closed: !closeTimig.is_closed
+                });
+            setDisable(false);
+        } catch (error) {
+            setDisable(false);
+        }
+    }
+
     return (
         <Grid container spacing={2}>
+            <Grid container item md={12} justify="flex-end">
+                <Button
+                    variant="contained"
+                    color="primary"
+                    disabled={disable}
+                    onClick={openCloseShop}
+                >
+                    {closeTimig.is_closed ? "Open" : "Close"}
+                </Button>
+            </Grid>
+            <Grid
+                container
+                item
+                md={12}
+                justify="center"
+                className={classes.chart}
+            >
+                {loading ? (
+                    <></>
+                ) : (
+                    <HighchartsReact
+                        highcharts={Highcharts}
+                        options={chartConfig}
+                    />
+                )}
+            </Grid>
             <Grid item md={2}>
                 <Widget
                     name="Pending Orders"

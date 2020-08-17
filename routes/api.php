@@ -24,6 +24,9 @@ Route::group(['middleware' => ['json.response']], function () {
         Route::get('/print', "API\SiteController@printReciept");
         Route::get('/order-counts', 'API\OrderController@dashboard');
         Route::get('/order/complete/{id}', "API\OrderController@complete");
+        Route::get('/close-timing', "API\ClosingController@index");
+        Route::get('/close-timing/open', "API\ClosingController@store");
+        Route::get('/close-timing/close', "API\ClosingController@update");
         Route::resource('/user', "API\UserController");
         Route::resource('/category', 'API\CategoryController');
         Route::resource('/menu', 'API\MenuController');

@@ -6,6 +6,7 @@ use App\Order;
 use App\OrderItems;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Repositories\ClosingTimeRepository;
 
 class OrderRepository
 {
@@ -111,30 +112,66 @@ class OrderRepository
 
     function dashboardCount()
     {
+
         $user = Auth::user();
         $user_id = $user->parent_id === 0 ? $user->id : $user->parent_id;
+        $closeRepository =  new ClosingTimeRepository;
+        $openTiming = $closeRepository->open();
+        $todayOrders = ["today" => 0];
+        if ($openTiming) {
+            if (!$openTiming->is_close) {
+                $todayOrders = Order::selectRaw("count(id) as today")
+                    ->whereRaw("created_at BETWEEN ? AND NOW()", [$openTiming->created_at])
+                    ->where("user_id", $user_id)
+                    ->first();
+            } else {
+                $todayOrders = Order::selectRaw("count(id) as today")
+                    ->whereRaw("created_at BETWEEN ? - ?", [$openTiming->created_at, $openTiming->updated_at])
+                    ->where("user_id", $user_id)
+                    ->first();
+            }
+        }
 
-        $todayOrders = Order::selectRaw("count(id) as today")
-            ->whereRaw("date(created_at) = date(NOW())")
-            ->where("user_id", $user_id)
-            ->first();
+        $closingMonths = [];
+        $closings = $closeRepository->getCurrentMonth();
+        $list = [];
+        foreach ($closings as $closing) {
+            // DB::enableQueryLog();
+            if (!$openTiming->is_close) {
+                $orders = Order::selectRaw("count(id) as today")
+                    ->whereRaw("created_at BETWEEN ? AND NOW()", [$closing->created_at])
+                    ->where("user_id", $user_id)
+                    ->first();
+            } else {
+                $orders = Order::selectRaw("count(id) as today")
+                    ->whereRaw("created_at BETWEEN ? - ?", [$closing->created_at, $closing->updated_at])
+                    ->where("user_id", $user_id)
+                    ->first();
+            }
+            array_push($closingMonths, [$closing->created_at->format("Y-m-d"), $orders["today"]]);
+            array_push($list, $closing->created_at->format("Y-m-d"));
+            // dd(DB::getQueryLog());
+        }
 
         $last15Days = Order::selectRaw("count(id) as fiftenDays")
-            ->whereRaw("created_at BETWEEN NOW() - INTERVAL 15 DAY AND NOW()")
+            ->whereRaw("created_at BETWEEN NOW() - INTERVAL 15 DAY")
             ->where("user_id", $user_id)
             ->first();
         $last30Days = Order::selectRaw("count(id) as thirtyDays")
-            ->whereRaw("created_at BETWEEN NOW() - INTERVAL 30 DAY AND NOW()")
+            ->whereRaw("created_at BETWEEN NOW() - INTERVAL 30 DAY")
             ->where("user_id", $user_id)
             ->first();
         $pendingOrders = Order::selectRaw("count(id) as today")
             ->where(["user_id" => $user_id, "status" => "pending"])
             ->first();
+
         return [
             "pendingOrders" => $pendingOrders["today"],
             "today" => $todayOrders["today"],
             "lastFifteen" => $last15Days["fiftenDays"],
-            "lastThirty" => $last30Days["thirtyDays"]
+            "lastThirty" => $last30Days["thirtyDays"],
+            "months" => $closingMonths,
+            "labels" => $list
         ];
     }
 }
