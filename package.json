@@ -30,7 +30,7 @@
         "fibers": "^5.0.0",
         "highcharts": "^9.0.0",
         "highcharts-react-official": "^3.0.0",
-        "material-table": "^1.68.0",
+        "material-table": "^1.69.3",
         "node-sass": "^7.0.0",
         "print-js": "^1.0.63",
         "react-router-dom": "^5.2.0"
